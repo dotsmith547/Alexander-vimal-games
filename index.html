@@ -1,116 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AlexanderVimal Games</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AlexanderVimal Games</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    body{margin:0;font-family:Nunito;background:#0d0d1a;color:#fff;overflow-x:hidden;}
-    nav{position:fixed;top:0;width:100%;background:#111;padding:10px;z-index:100;}
-    .section-pad{padding:80px 20px;text-align:center;}
-    .section-title{font-size:28px;font-weight:800;}
-    .section-tag{color:#e94560;font-size:12px;letter-spacing:2px;}
-    .btn-primary{background:#e94560;color:#fff;padding:10px 20px;border:none;border-radius:25px;cursor:pointer;}
-    canvas{background:black;border-radius:10px;margin-top:20px;}
-  </style>
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0d0d1a;
+  color:white;
+  text-align:center;
+}
+section{padding:60px 10px;}
+canvas{
+  background:black;
+  border:2px solid #444;
+  border-radius:10px;
+  margin-top:10px;
+}
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  background:#e94560;
+  color:white;
+  cursor:pointer;
+  margin-top:10px;
+}
+</style>
 </head>
 
 <body>
 
-<!-- NAV -->
-<nav>
-  ⚡ AlexanderVimal Games
-</nav>
-
-<!-- HERO (YOUR ORIGINAL KEEP AREA) -->
-<section class="section-pad">
-  <h1 class="section-title">Level Up Your Gaming Experience</h1>
-  <p>Welcome to AlexanderVimal Games</p>
-</section>
+<h1>⚡ AlexanderVimal Games</h1>
 
 <!-- ================= PACMAN ================= -->
-<section id="game" class="section-pad">
-  <div class="section-tag">Mini Game</div>
-  <h2 class="section-title">Pac-Man</h2>
-
-  <canvas id="pacman" width="300" height="300"></canvas><br>
-  <button class="btn-primary" onclick="startPacman()">Start Pac-Man</button>
+<section>
+<h2>Pac-Man (Ghost Game)</h2>
+<canvas id="pacman" width="300" height="300"></canvas><br>
+<button onclick="startPacman()">Start Pac-Man</button>
 </section>
 
 <!-- ================= AMIT SUFFERS ================= -->
-<section class="section-pad">
-  <div class="section-tag">New Game</div>
-  <h2 class="section-title">AMIT SUFFERS</h2>
-
-  <canvas id="amit" width="300" height="300"></canvas><br>
-  <button class="btn-primary" onclick="startAmit()">Start Game</button>
+<section>
+<h2>AMIT SUFFERS (Runner Game)</h2>
+<canvas id="amit" width="300" height="300"></canvas><br>
+<button onclick="startRunner()">Start Game</button>
 </section>
 
-<!-- ================= SCRIPT ================= -->
 <script>
 
-/* PACMAN */
+/* ================= PACMAN ================= */
 function startPacman(){
-  const c=document.getElementById("pacman");
-  const ctx=c.getContext("2d");
 
-  let x=20;
+const c = document.getElementById("pacman");
+const ctx = c.getContext("2d");
 
-  function loop(){
-    ctx.clearRect(0,0,300,300);
+let player = {x:30,y:30,dx:30,dy:0};
 
-    ctx.fillStyle="yellow";
-    ctx.beginPath();
-    ctx.arc(x,100,15,0,Math.PI*2);
-    ctx.fill();
+let ghosts = [
+  {x:240,y:30,vx:1,vy:0,color:"red"},
+  {x:240,y:240,vx:-1,vy:0,color:"blue"},
+  {x:30,y:240,vx:1,vy:1,color:"green"}
+];
 
-    x+=3;
-    if(x>300) x=0;
+// control
+document.onkeydown = (e)=>{
+  if(e.key=="ArrowRight") player.dx=3,player.dy=0;
+  if(e.key=="ArrowLeft") player.dx=-3,player.dy=0;
+  if(e.key=="ArrowUp") player.dx=0,player.dy=-3;
+  if(e.key=="ArrowDown") player.dx=0,player.dy=3;
+};
 
-    requestAnimationFrame(loop);
+function drawMaze(){
+  ctx.strokeStyle="#222";
+  for(let i=0;i<300;i+=30){
+    ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,300);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(300,i);ctx.stroke();
   }
-  loop();
 }
 
-/* AMIT SUFFERS RUNNER */
-function startAmit(){
-  const c=document.getElementById("amit");
-  const ctx=c.getContext("2d");
+function loop(){
+ctx.clearRect(0,0,300,300);
 
-  let px=50;
-  let py=250;
-  let ox=300;
+drawMaze();
 
-  document.onkeydown=(e)=>{
-    if(e.code==="Space") py=180;
-    setTimeout(()=>py=250,300);
+// player
+ctx.fillStyle="yellow";
+ctx.beginPath();
+ctx.arc(player.x,player.y,10,0,Math.PI*2);
+ctx.fill();
+
+player.x += player.dx;
+player.y += player.dy;
+
+// walls boundary
+if(player.x<10)player.x=10;
+if(player.y<10)player.y=10;
+if(player.x>290)player.x=290;
+if(player.y>290)player.y=290;
+
+// ghosts
+ghosts.forEach(g=>{
+ctx.fillStyle=g.color;
+ctx.fillRect(g.x,g.y,15,15);
+
+g.x += g.vx;
+g.y += g.vy;
+
+// bounce
+if(g.x<0||g.x>285) g.vx*=-1;
+if(g.y<0||g.y>285) g.vy*=-1;
+});
+
+requestAnimationFrame(loop);
+}
+loop();
+}
+
+/* ================= AMIT SUFFERS ================= */
+function startRunner(){
+
+const c = document.getElementById("amit");
+const ctx = c.getContext("2d");
+
+let playerY = 250;
+let jump = false;
+
+let obstacles = [
+  {x:300},{x:450},{x:600}
+];
+
+document.onkeydown = (e)=>{
+  if(e.code=="Space" && !jump){
+    jump=true;
+    playerY=180;
+    setTimeout(()=>{playerY=250;jump=false;},400);
   }
+};
 
-  function loop(){
-    ctx.clearRect(0,0,300,300);
+function loop(){
+ctx.clearRect(0,0,300,300);
 
-    // ground
-    ctx.fillStyle="green";
-    ctx.fillRect(0,270,300,30);
+// ground
+ctx.fillStyle="green";
+ctx.fillRect(0,270,300,30);
 
-    // player
-    ctx.fillStyle="cyan";
-    ctx.fillRect(px,py,20,20);
+// player
+ctx.fillStyle="cyan";
+ctx.fillRect(50,playerY,20,20);
 
-    // obstacle
-    ctx.fillStyle="red";
-    ctx.fillRect(ox,250,20,20);
+// obstacles
+ctx.fillStyle="red";
+obstacles.forEach(o=>{
+o.x -= 4;
 
-    ox-=4;
-    if(ox<0) ox=300;
+ctx.fillRect(o.x,250,20,20);
 
-    requestAnimationFrame(loop);
-  }
-  loop();
+// reset
+if(o.x<-20){
+o.x=300+Math.random()*200;
+}
+});
+
+requestAnimationFrame(loop);
+}
+loop();
 }
 
 </script>
