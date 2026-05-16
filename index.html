@@ -1,174 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AlexanderVimal Games</title>
 
+<script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0d0d1a;
-  color:white;
-  text-align:center;
-}
-section{padding:60px 10px;}
-canvas{
-  background:black;
-  border:2px solid #444;
-  border-radius:10px;
-  margin-top:10px;
-}
-button{
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
-  background:#e94560;
-  color:white;
-  cursor:pointer;
-  margin-top:10px;
-}
+body{margin:0;font-family:Arial;background:#0d0d1a;color:white;}
+.section-pad{padding:50px 20px;}
+.section-title{font-size:28px;font-weight:bold;text-align:center;}
+.glass{background:rgba(255,255,255,0.05);padding:20px;border-radius:15px;margin:20px auto;max-width:900px;}
+canvas{display:block;margin:auto;background:black;border-radius:10px;}
+.btn{padding:8px 16px;margin:5px;background:#e94560;border:none;color:white;border-radius:8px;cursor:pointer;}
 </style>
 </head>
 
 <body>
 
-<h1>⚡ AlexanderVimal Games</h1>
+<!-- HEADER -->
+<div class="section-pad">
+  <h1 class="section-title">⚡ AlexanderVimal Games</h1>
+</div>
 
 <!-- ================= PACMAN ================= -->
-<section>
-<h2>Pac-Man (Ghost Game)</h2>
-<canvas id="pacman" width="300" height="300"></canvas><br>
-<button onclick="startPacman()">Start Pac-Man</button>
-</section>
+<div class="glass">
+<h2 style="text-align:center;">🟡 PAC-MAN ULTRA PRO MAX</h2>
+<canvas id="pac" width="320" height="320"></canvas>
 
-<!-- ================= AMIT SUFFERS ================= -->
-<section>
-<h2>AMIT SUFFERS (Runner Game)</h2>
-<canvas id="amit" width="300" height="300"></canvas><br>
-<button onclick="startRunner()">Start Game</button>
-</section>
+<div style="text-align:center;margin-top:10px;">
+<button class="btn" onclick="move('up')">⬆️</button>
+<button class="btn" onclick="move('left')">⬅️</button>
+<button class="btn" onclick="move('down')">⬇️</button>
+<button class="btn" onclick="move('right')">➡️</button>
+</div>
+</div>
+
+<!-- ================= RUNNER ================= -->
+<div class="glass">
+<h2 style="text-align:center;">🏃 AMIT SUFFERS ULTRA PRO MAX</h2>
+<canvas id="run" width="320" height="200"></canvas>
+</div>
 
 <script>
 
 /* ================= PACMAN ================= */
-function startPacman(){
 
-const c = document.getElementById("pacman");
-const ctx = c.getContext("2d");
+const pac = document.getElementById("pac");
+const ctx = pac.getContext("2d");
 
-let player = {x:30,y:30,dx:30,dy:0};
+let p = {x:160,y:160,dir:"right",score:0};
 
 let ghosts = [
-  {x:240,y:30,vx:1,vy:0,color:"red"},
-  {x:240,y:240,vx:-1,vy:0,color:"blue"},
-  {x:30,y:240,vx:1,vy:1,color:"green"}
+{x:30,y:30,c:"red"},
+{x:280,y:30,c:"blue"},
+{x:30,y:280,c:"green"}
 ];
 
-// control
-document.onkeydown = (e)=>{
-  if(e.key=="ArrowRight") player.dx=3,player.dy=0;
-  if(e.key=="ArrowLeft") player.dx=-3,player.dy=0;
-  if(e.key=="ArrowUp") player.dx=0,player.dy=-3;
-  if(e.key=="ArrowDown") player.dx=0,player.dy=3;
-};
+// maze walls
+let walls = [
+{x:0,y:0,w:320,h:10},
+{x:0,y:310,w:320,h:10},
+{x:0,y:0,w:10,h:320},
+{x:310,y:0,w:10,h:320},
+{x:120,y:60,w:10,h:200},
+{x:200,y:60,w:10,h:200}
+];
 
-function drawMaze(){
-  ctx.strokeStyle="#222";
-  for(let i=0;i<300;i+=30){
-    ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,300);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(300,i);ctx.stroke();
-  }
-}
+function move(d){p.dir=d;}
 
-function loop(){
-ctx.clearRect(0,0,300,300);
+document.addEventListener("keydown",(e)=>{
+if(e.key=="ArrowUp")p.dir="up";
+if(e.key=="ArrowDown")p.dir="down";
+if(e.key=="ArrowLeft")p.dir="left";
+if(e.key=="ArrowRight")p.dir="right";
+});
 
-drawMaze();
+function drawPac(){
 
-// player
+ctx.clearRect(0,0,320,320);
+
+// walls
+ctx.fillStyle="gray";
+walls.forEach(w=>ctx.fillRect(w.x,w.y,w.w,w.h));
+
+// pacman
 ctx.fillStyle="yellow";
 ctx.beginPath();
-ctx.arc(player.x,player.y,10,0,Math.PI*2);
+ctx.arc(p.x,p.y,10,0,Math.PI*2);
 ctx.fill();
 
-player.x += player.dx;
-player.y += player.dy;
-
-// walls boundary
-if(player.x<10)player.x=10;
-if(player.y<10)player.y=10;
-if(player.x>290)player.x=290;
-if(player.y>290)player.y=290;
-
-// ghosts
+// ghosts AI
 ghosts.forEach(g=>{
-ctx.fillStyle=g.color;
+ctx.fillStyle=g.c;
 ctx.fillRect(g.x,g.y,15,15);
 
-g.x += g.vx;
-g.y += g.vy;
-
-// bounce
-if(g.x<0||g.x>285) g.vx*=-1;
-if(g.y<0||g.y>285) g.vy*=-1;
+if(g.x<p.x)g.x+=0.7;
+if(g.x>p.x)g.x-=0.7;
+if(g.y<p.y)g.y+=0.7;
+if(g.y>p.y)g.y-=0.7;
 });
 
-requestAnimationFrame(loop);
+// movement
+if(p.dir=="right")p.x+=2;
+if(p.dir=="left")p.x-=2;
+if(p.dir=="up")p.y-=2;
+if(p.dir=="down")p.y+=2;
+
+// loop
+if(p.x<0)p.x=320;
+if(p.x>320)p.x=0;
+if(p.y<0)p.y=320;
+if(p.y>320)p.y=0;
+
+requestAnimationFrame(drawPac);
 }
-loop();
+drawPac();
+
+
+/* ================= RUNNER GAME ================= */
+
+const r = document.getElementById("run");
+const rctx = r.getContext("2d");
+
+let player = {x:50,y:150,vy:0,ground:true};
+let obs = [{x:320,y:150},{x:500,y:150}];
+
+document.addEventListener("keydown",(e)=>{
+if(e.code=="Space")jump();
+});
+
+function jump(){
+if(player.ground){
+player.vy=-8;
+player.ground=false;
+}
 }
 
-/* ================= AMIT SUFFERS ================= */
-function startRunner(){
+function run(){
 
-const c = document.getElementById("amit");
-const ctx = c.getContext("2d");
-
-let playerY = 250;
-let jump = false;
-
-let obstacles = [
-  {x:300},{x:450},{x:600}
-];
-
-document.onkeydown = (e)=>{
-  if(e.code=="Space" && !jump){
-    jump=true;
-    playerY=180;
-    setTimeout(()=>{playerY=250;jump=false;},400);
-  }
-};
-
-function loop(){
-ctx.clearRect(0,0,300,300);
+rctx.clearRect(0,0,320,200);
 
 // ground
-ctx.fillStyle="green";
-ctx.fillRect(0,270,300,30);
+rctx.fillStyle="white";
+rctx.fillRect(0,170,320,2);
 
 // player
-ctx.fillStyle="cyan";
-ctx.fillRect(50,playerY,20,20);
+rctx.fillStyle="cyan";
+rctx.fillRect(player.x,player.y,15,15);
+
+// physics
+player.y+=player.vy;
+player.vy+=0.4;
+
+if(player.y>=150){
+player.y=150;
+player.ground=true;
+}
 
 // obstacles
-ctx.fillStyle="red";
-obstacles.forEach(o=>{
-o.x -= 4;
+obs.forEach(o=>{
+rctx.fillStyle="red";
+rctx.fillRect(o.x,o.y,15,15);
 
-ctx.fillRect(o.x,250,20,20);
-
-// reset
-if(o.x<-20){
-o.x=300+Math.random()*200;
-}
+o.x-=3;
+if(o.x<0)o.x=320+Math.random()*200;
 });
 
-requestAnimationFrame(loop);
+requestAnimationFrame(run);
 }
-loop();
-}
+run();
 
 </script>
 
