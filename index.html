@@ -173,6 +173,189 @@ requestAnimationFrame(run);
 run();
 
 </script>
+<script>
 
+/* ================= PACMAN PRO FIXED ================= */
+
+const canvas = document.getElementById("pacmanCanvas");
+const ctx = canvas.getContext("2d");
+
+let gameOver = false;
+
+let pac = {
+  x: 160,
+  y: 160,
+  r: 10,
+  dir: "right",
+  speed: 2,
+  alive: true
+};
+
+let ghosts = [
+  {x: 40, y: 40, c: "red"},
+  {x: 280, y: 40, c: "blue"},
+  {x: 40, y: 280, c: "green"}
+];
+
+// controls
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="ArrowUp") pac.dir="up";
+  if(e.key==="ArrowDown") pac.dir="down";
+  if(e.key==="ArrowLeft") pac.dir="left";
+  if(e.key==="ArrowRight") pac.dir="right";
+});
+
+function movePac(d){pac.dir=d;}
+
+function resetGame(){
+  pac.x=160;
+  pac.y=160;
+  pac.alive=true;
+  gameOver=false;
+
+  ghosts=[
+    {x:40,y:40,c:"red"},
+    {x:280,y:40,c:"blue"},
+    {x:40,y:280,c:"green"}
+  ];
+}
+
+function collision(a,b){
+  return Math.hypot(a.x-b.x,a.y-b.y)<15;
+}
+
+function update(){
+
+if(!pac.alive){
+  ctx.fillStyle="white";
+  ctx.font="20px Arial";
+  ctx.fillText("GAME OVER",100,160);
+  ctx.fillText("Press R to Restart",70,190);
+  return;
+}
+
+// movement
+if(pac.dir==="right") pac.x+=pac.speed;
+if(pac.dir==="left") pac.x-=pac.speed;
+if(pac.dir==="up") pac.y-=pac.speed;
+if(pac.dir==="down") pac.y+=pac.speed;
+
+// loop screen
+if(pac.x>320) pac.x=0;
+if(pac.x<0) pac.x=320;
+if(pac.y>320) pac.y=0;
+if(pac.y<0) pac.y=320;
+
+// ghost AI
+ghosts.forEach(g=>{
+  if(g.x<pac.x) g.x+=1;
+  if(g.x>pac.x) g.x-=1;
+  if(g.y<pac.y) g.y+=1;
+  if(g.y>pac.y) g.y-=1;
+
+  // collision kill
+  if(collision(pac,g)){
+    pac.alive=false;
+  }
+});
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,320,320);
+
+// pacman
+ctx.fillStyle="yellow";
+ctx.beginPath();
+ctx.arc(pac.x,pac.y,10,0,Math.PI*2);
+ctx.fill();
+
+// ghosts
+ghosts.forEach(g=>{
+ctx.fillStyle=g.c;
+ctx.fillRect(g.x,g.y,15,15);
+});
+
+}
+
+function loop(){
+update();
+draw();
+requestAnimationFrame(loop);
+}
+
+loop();
+
+// restart key
+document.addEventListener("keydown",(e)=>{
+if(e.key==="r" || e.key==="R"){
+resetGame();
+}
+});
+
+</script>
+  <script>
+
+const rcanvas = document.getElementById("runnerCanvas");
+const rctx = rcanvas.getContext("2d");
+
+let player = {x:50,y:150,vy:0,ground:true};
+let obstacles = [{x:320,y:150},{x:500,y:150}];
+
+document.addEventListener("keydown",(e)=>{
+if(e.code==="Space") jump();
+});
+
+function jump(){
+if(player.ground){
+player.vy=-8;
+player.ground=false;
+}
+}
+
+function run(){
+
+rctx.clearRect(0,0,320,200);
+
+// ground
+rctx.fillStyle="white";
+rctx.fillRect(0,170,320,2);
+
+// player
+rctx.fillStyle="cyan";
+rctx.fillRect(player.x,player.y,15,15);
+
+// physics
+player.y+=player.vy;
+player.vy+=0.4;
+
+if(player.y>=150){
+player.y=150;
+player.ground=true;
+}
+
+// obstacles
+obstacles.forEach(o=>{
+rctx.fillStyle="red";
+rctx.fillRect(o.x,o.y,15,15);
+
+o.x-=3;
+if(o.x<0)o.x=320+Math.random()*200;
+
+// collision
+if(o.x<player.x+15 && o.x+15>player.x && o.y===player.y){
+alert("Game Over!");
+location.reload();
+}
+
+});
+
+requestAnimationFrame(run);
+}
+
+run();
+
+  </script>
 </body>
 </html>
