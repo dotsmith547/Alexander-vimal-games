@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AlexanderVimal Games</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            nunito: ['Nunito', 'sans-serif'],
+          },
+          colors: {
+            primary:   '#1a1a2e',
+            secondary: '#16213e',
+            accent:    '#0f3460',
+            neon:      '#e94560',
+            gold:      '#f5a623',
+            cyan:      '#00d4ff',
+            softbg:    '#f0f4ff',
+          },
+          animation: {
+            'float':      'float 3s ease-in-out infinite',
+            'glow':       'glow 2s ease-in-out infinite alternate',
+            'slide-in':   'slideIn 0.8s ease forwards',
+            'pulse-neon': 'pulseNeon 1.5s ease-in-out infinite',
+          },
+          keyframes: {
+            float:      { '0%,100%': {transform:'translateY(0)'}, '50%': {transform:'translateY(-12px)'} },
+            glow:       { from: {textShadow:'0 0 5px #e94560,0 0 10px #e94560'}, to: {textShadow:'0 0 20px #e94560,0 0 40px #e94560'} },
+            slideIn:    { from: {opacity:'0',transform:'translateY(30px)'}, to: {opacity:'1',transform:'translateY(0)'} },
+            pulseNeon:  { '0%,100%': {boxShadow:'0 0 8px #e94560'}, '50%': {boxShadow:'0 0 24px #e94560,0 0 48px #e94560'} },
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ── Base ── */
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',sans-serif;background:#0d0d1a;color:#e8e8f0;overflow-x:hidden;}
+    html{scroll-behavior:smooth;}
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:#1a1a2e;}
+    ::-webkit-scrollbar-thumb{background:#e94560;border-radius:3px;}
+
+    /* ── Starfield ── */
+    #stars-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+    /* ── Nav ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,26,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(233,69,96,.2);}
+    .nav-logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.2rem;background:linear-gradient(135deg,#e94560,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .nav-link{color:#ccc;text-decoration:none;font-weight:600;font-size:.9rem;transition:color .3s;}
+    .nav-link:hover{color:#e94560;}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+    .hamburger span{width:25px;height:2px;background:#e94560;border-radius:2px;transition:all .3s;}
+    @media(max-width:768px){
+      .hamburger{display:flex;}
+      #nav-menu{display:none;flex-direction:column;gap:1rem;padding:1rem 0;}
+      #nav-menu.open{display:flex;}
+    }
+
+    /* ── Hero ── */
+    .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;padding-top:80px;}
+    .hero-title{font-family:'Orbitron',sans-serif;font-size:clamp(2rem,6vw,4.5rem);font-weight:900;line-height:1.1;animation:glow 2s ease-in-out infinite alternate;}
+    .hero-gradient-text{background:linear-gradient(135deg,#e94560,#f5a623,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .hero-badge{display:inline-block;background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.4);border-radius:50px;padding:.35rem 1rem;font-size:.8rem;letter-spacing:.1em;color:#e94560;text-transform:uppercase;margin-bottom:1rem;}
+    .hero-float{animation:float 3s ease-in-out infinite;}
+    .btn-primary{background:linear-gradient(135deg,#e94560,#c0392b);color:#fff;font-family:'Orbitron',sans-serif;font-weight:700;padding:.9rem 2.2rem;border-radius:50px;border:none;cursor:pointer;font-size:.95rem;letter-spacing:.05em;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(233,69,96,.4);}
+    .btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(233,69,96,.6);}
+    .btn-secondary{background:transparent;color:#00d4ff;font-family:'Orbitron',sans-serif;font-weight:700;padding:.9rem 2.2rem;border-radius:50px;border:2px solid #00d4ff;cursor:pointer;font-size:.95rem;transition:all .2s;}
+    .btn-secondary:hover{background:#00d4ff;color:#0d0d1a;}
+    .btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-weight:700;padding:.8rem 1.8rem;border-radius:50px;border:none;cursor:pointer;font-size:.9rem;display:inline-flex;align-items:center;gap:.5rem;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(37,211,102,.3);}
+    .btn-wa:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(37,211,102,.5);}
+
+    /* ── Section titles ── */
+    .section-tag{font-family:'Orbitron',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:#e94560;margin-bottom:.5rem;}
+    .section-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.6rem,4vw,2.6rem);font-weight:800;color:#fff;}
+    .title-underline{width:60px;height:3px;background:linear-gradient(90deg,#e94560,#00d4ff);border-radius:2px;margin:.8rem 0 2rem;}
+
+    /* ── Cards ── */
+    .glass-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;transition:transform .3s,box-shadow .3s,border-color .3s;backdrop-filter:blur(10px);}
+    .glass-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(233,69,96,.15);border-color:rgba(233,69,96,.35);}
+    .service-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:1.2rem;}
+
+    /* ── Stats ── */
+    .stat-num{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;color:#e94560;}
+
+    /* ── Form ── */
+    .form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:.85rem 1.1rem;color:#e8e8f0;font-family:'Nunito',sans-serif;font-size:.95rem;outline:none;transition:border-color .3s,box-shadow .3s;}
+    .form-input:focus{border-color:#e94560;box-shadow:0 0 0 3px rgba(233,69,96,.15);}
+    .form-input::placeholder{color:#888;}
+    textarea.form-input{resize:vertical;min-height:130px;}
+    select.form-input option{background:#1a1a2e;}
+    .submit-btn{width:100%;background:linear-gradient(135deg,#e94560,#c0392b);color:#fff;font-family:'Orbitron',sans-serif;font-weight:700;padding:1rem;border-radius:12px;border:none;cursor:pointer;font-size:1rem;letter-spacing:.05em;transition:all .3s;box-shadow:0 4px 20px rgba(233,69,96,.4);}
+    .submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(233,69,96,.6);}
+    .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+    /* ── Booking Modal ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .modal-overlay.open{opacity:1;pointer-events:all;}
+    .modal-box{background:#1a1a2e;border:1px solid rgba(233,69,96,.3);border-radius:24px;padding:2.5rem;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(30px);transition:transform .3s;}
+    .modal-overlay.open .modal-box{transform:translateY(0);}
+
+    /* ── Pac-Man Game ── */
+    #pacman-section{background:linear-gradient(135deg,rgba(26,26,46,.95),rgba(22,33,62,.95));}
+    #game-container{position:relative;display:flex;flex-direction:column;align-items:center;gap:1rem;}
+    #pacman-canvas{border:2px solid rgba(233,69,96,.4);border-radius:12px;background:#000;display:block;max-width:100%;}
+    .play-btn{background:linear-gradient(135deg,#e94560,#f5a623);color:#fff;font-family:'Orbitron',sans-serif;font-weight:900;padding:1.2rem 3.5rem;border-radius:60px;border:none;cursor:pointer;font-size:1.3rem;letter-spacing:.1em;transition:all .3s;box-shadow:0 6px 30px rgba(233,69,96,.5);animation:pulse-neon 1.5s ease-in-out infinite;position:relative;overflow:hidden;}
+    .play-btn::before{content:'';position:absolute;top:-50%;left:-60%;width:200%;height:200%;background:rgba(255,255,255,.1);transform:skewX(-20deg);transition:left .4s;}
+    .play-btn:hover::before{left:100%;}
+    .play-btn:hover{transform:scale(1.08);box-shadow:0 12px 50px rgba(233,69,96,.7);}
+    @keyframes pulse-neon{0%,100%{box-shadow:0 6px 30px rgba(233,69,96,.5);}50%{box-shadow:0 6px 50px rgba(233,69,96,.9),0 0 80px rgba(245,166,35,.3);}}
+    #game-score{font-family:'Orbitron',sans-serif;font-size:1rem;color:#f5a623;}
+    #game-lives{font-family:'Orbitron',sans-serif;font-size:.9rem;color:#00d4ff;}
+    .game-controls{display:none;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:.5rem;}
+    .game-controls.show{display:flex;}
+    .ctrl-btn{background:rgba(233,69,96,.2);border:1px solid rgba(233,69,96,.4);color:#e94560;border-radius:8px;width:50px;height:50px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+    .ctrl-btn:hover,.ctrl-btn:active{background:rgba(233,69,96,.5);}
+    .ctrl-row{display:flex;gap:.5rem;}
+
+    /* ── Footer ── */
+    footer{background:#0a0a18;border-top:1px solid rgba(233,69,96,.15);}
+
+    /* ── Floating WhatsApp ── */
+    #float-wa{position:fixed;bottom:2rem;right:2rem;z-index:150;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-size:1.6rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);animation:float 3s ease-in-out infinite;text-decoration:none;transition:transform .2s,box-shadow .2s;}
+    #float-wa:hover{transform:scale(1.15);box-shadow:0 8px 30px rgba(37,211,102,.6);}
+
+    /* ── Utilities ── */
+    .section-pad{padding:5rem 1rem;}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(233,69,96,.3),transparent);margin:0;}
+  </style>
+</head>
+<body>
+
+<!-- ══════════ STARFIELD CANVAS ══════════ -->
+<canvas id="stars-canvas"></canvas>
+
+<!-- ══════════ NAVBAR ══════════ -->
+<nav>
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <span class="nav-logo">⚡ AlexanderVimal<span style="color:#00d4ff">Games</span></span>
+
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex items-center gap-6">
+      <a href="#home"     class="nav-link">Home</a>
+      <a href="#about"    class="nav-link">About</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#game"     class="nav-link">Play</a>
+      <a href="#contact"  class="nav-link">Contact</a>
+      <button onclick="openModal()" class="btn-primary" style="padding:.6rem 1.4rem;font-size:.82rem;">Free Demo</button>
+    </div>
+
+    <!-- Hamburger -->
+    <button class="hamburger md:hidden" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="nav-menu" class="md:hidden px-4 pb-2">
+    <a href="#home"     class="nav-link block py-1" onclick="toggleMenu()">Home</a>
+    <a href="#about"    class="nav-link block py-1" onclick="toggleMenu()">About</a>
+    <a href="#services" class="nav-link block py-1" onclick="toggleMenu()">Services</a>
+    <a href="#game"     class="nav-link block py-1" onclick="toggleMenu()">Play</a>
+    <a href="#contact"  class="nav-link block py-1" onclick="toggleMenu()">Contact</a>
+    <button onclick="openModal();toggleMenu();" class="btn-primary mt-2" style="padding:.6rem 1.4rem;font-size:.82rem;">Free Demo</button>
+  </div>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<section id="home" class="hero">
+  <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12 w-full">
+
+    <!-- Text -->
+    <div class="flex-1 text-center md:text-left" style="animation:slideIn .8s ease forwards;">
+      <div class="hero-badge">🎮 Gaming Studio · Est. 2024</div>
+      <h1 class="hero-title mb-4">
+        <span class="hero-gradient-text">Level Up</span><br/>Your Gaming<br/>Experience
+      </h1>
+      <p class="text-gray-300 text-lg mb-8 leading-relaxed max-w-lg mx-auto md:mx-0">
+        Welcome to <strong style="color:#00d4ff">AlexanderVimal Games</strong> — where epic games meet thrilling live streams and cinematic gameplay videos from Bilaspur, Chhattisgarh.
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+        <button onclick="openModal()" class="btn-primary">🎯 Free Demo Trial</button>
+        <a href="#game" class="btn-secondary" style="display:inline-block;text-align:center;">🕹️ Play Pac-Man</a>
+      </div>
+      <div class="flex flex-wrap gap-8 mt-10 justify-center md:justify-start">
+        <div><div class="stat-num">50+</div><div class="text-gray-400 text-sm">Games Made</div></div>
+        <div><div class="stat-num">10K+</div><div class="text-gray-400 text-sm">Stream Viewers</div></div>
+        <div><div class="stat-num">200+</div><div class="text-gray-400 text-sm">Happy Fans</div></div>
+      </div>
+    </div>
+
+    <!-- Hero Illustration -->
+    <div class="flex-1 flex justify-center items-center hero-float">
+      <div style="width:280px;height:280px;background:radial-gradient(circle at 40% 40%,rgba(233,69,96,.25),rgba(0,212,255,.1));border:2px solid rgba(233,69,96,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8rem;box-shadow:0 0 60px rgba(233,69,96,.2);">
+        🎮
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════ ABOUT ══════════ -->
+<section id="about" class="section-pad">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="text-center mb-12">
+      <div class="section-tag">About Us</div>
+      <h2 class="section-title">Who We Are</h2>
+      <div class="title-underline mx-auto"></div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-10 items-center">
+      <div class="glass-card p-8">
+        <h3 class="font-orbitron text-xl font-bold text-white mb-4">🏆 Our Story</h3>
+        <p class="text-gray-300 leading-relaxed mb-4">
+          AlexanderVimal Games is a passionate indie gaming studio based in <strong style="color:#00d4ff">Vidya Nagar, Bilaspur, Chhattisgarh</strong>. We create original games, deliver entertaining live streams, and produce high-quality gameplay videos.
+        </p>
+        <p class="text-gray-300 leading-relaxed">
+          From concept to controller — we pour heart, hustle, and creativity into every project, building unforgettable gaming experiences for players worldwide.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <span style="background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.3);color:#e94560;padding:.3rem .9rem;border-radius:50px;font-size:.8rem;font-weight:700;">🎮 Game Dev</span>
+          <span style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:#00d4ff;padding:.3rem .9rem;border-radius:50px;font-size:.8rem;font-weight:700;">📡 Live Streaming</span>
+          <span style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);color:#f5a623;padding:.3rem .9rem;border-radius:50px;font-size:.8rem;font-weight:700;">🎬 Gameplay Videos</span>
+        </div>
+      </div>
+      <div class="glass-card p-8">
+        <h3 class="font-orbitron text-xl font-bold text-white mb-6">📍 Contact Details</h3>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-map-marker-alt text-neon mt-1"></i>
+            <div>
+              <div class="text-gray-400 text-sm">Address</div>
+              <div class="text-white">Vidya Nagar, Bilaspur, Chhattisgarh</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fas fa-phone text-cyan mt-1"></i>
+            <div>
+              <div class="text-gray-400 text-sm">Phone</div>
+              <a href="tel:6266829276" class="text-white hover:text-cyan" style="color:#00d4ff">+91 6266829276</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fab fa-whatsapp" style="color:#25d366;margin-top:2px;"></i>
+            <div>
+              <div class="text-gray-400 text-sm">WhatsApp</div>
+              <a href="https://wa.me/916266829276" target="_blank" class="text-white" style="color:#25d366">+91 6266829276</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="fas fa-envelope text-gold mt-1"></i>
+            <div>
+              <div class="text-gray-400 text-sm">Email</div>
+              <a href="mailto:dotsmith547@gmail.com" style="color:#f5a623">dotsmith547@gmail.com</a>
+            </div>
+          </div>
+        </div>
+        <a href="https://wa.me/916266829276" target="_blank" class="btn-wa mt-6 inline-flex">
+          <i class="fab fa-whatsapp text-xl"></i> Chat on WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════ SERVICES ══════════ -->
+<section id="services" class="section-pad">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="text-center mb-12">
+      <div class="section-tag">What We Do</div>
+      <h2 class="section-title">Our Services</h2>
+      <div class="title-underline mx-auto"></div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Service 1 -->
+      <div class="glass-card p-8">
+        <div class="service-icon" style="background:linear-gradient(135deg,rgba(233,69,96,.25),rgba(233,69,96,.05));">
+          🎮
+        </div>
+        <h3 class="font-orbitron text-lg font-bold text-white mb-3">Game Development</h3>
+        <p class="text-gray-300 text-sm leading-relaxed mb-4">We design and build original, engaging games — from concept art to final release — with immersive mechanics and stunning visuals.</p>
+        <ul class="text-gray-400 text-sm space-y-2">
+          <li><i class="fas fa-check-circle text-neon mr-2"></i>2D &amp; 3D Games</li>
+          <li><i class="fas fa-check-circle text-neon mr-2"></i>Mobile &amp; PC Games</li>
+          <li><i class="fas fa-check-circle text-neon mr-2"></i>Custom Game Design</li>
+        </ul>
+      </div>
+
+      <!-- Service 2 -->
+      <div class="glass-card p-8">
+        <div class="service-icon" style="background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(0,212,255,.03));">
+          📡
+        </div>
+        <h3 class="font-orbitron text-lg font-bold text-white mb-3">Live Streaming</h3>
+        <p class="text-gray-300 text-sm leading-relaxed mb-4">High-energy live game streams with real-time interaction, commentary, and exciting giveaways. Join our growing community!</p>
+        <ul class="text-gray-400 text-sm space-y-2">
+          <li><i class="fas fa-check-circle" style="color:#00d4ff;margin-right:.5rem;"></i>Live Q&amp;A Sessions</li>
+          <li><i class="fas fa-check-circle" style="color:#00d4ff;margin-right:.5rem;"></i>Multiplayer Battles</li>
+          <li><i class="fas fa-check-circle" style="color:#00d4ff;margin-right:.5rem;"></i>Stream Highlights</li>
+        </ul>
+      </div>
+
+      <!-- Service 3 -->
+      <div class="glass-card p-8">
+        <div class="service-icon" style="background:linear-gradient(135deg,rgba(245,166,35,.2),rgba(245,166,35,.03));">
+          🎬
+        </div>
+        <h3 class="font-orbitron text-lg font-bold text-white mb-3">Gameplay Videos</h3>
+        <p class="text-gray-300 text-sm leading-relaxed mb-4">Cinematic, professionally edited gameplay videos — walkthroughs, reviews, tips &amp; tricks — to entertai
