@@ -328,3 +328,49 @@
         </div>
         <h3 class="font-orbitron text-lg font-bold text-white mb-3">Gameplay Videos</h3>
         <p class="text-gray-300 text-sm leading-relaxed mb-4">Cinematic, professionally edited gameplay videos — walkthroughs, reviews, tips &amp; tricks — to entertai
+          <script>
+// Pac-Man game code
+const canvas = document.getElementById("pacman-canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = 300;
+canvas.height = 300;
+
+let pacman = { x: 50, y: 50, size: 20, dx: 2, dy: 0 };
+let food = { x: 200, y: 200, size: 10 };
+let score = 0;
+
+function drawPacman() {
+  ctx.beginPath();
+  ctx.fillStyle = "yellow";
+  ctx.arc(pacman.x, pacman.y, pacman.size, 0.2 * Math.PI, 1.8 * Math.PI);
+  ctx.lineTo(pacman.x, pacman.y);
+  ctx.fill();
+}
+
+function drawFood() {
+  ctx.beginPath();
+  ctx.fillStyle = "red";
+  ctx.arc(food.x, food.y, food.size, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  pacman.x += pacman.dx;
+  pacman.y += pacman.dy;
+
+  drawPacman();
+  drawFood();
+
+  ctx.fillStyle = "white";
+  ctx.fillText("Score: " + score, 10, 20);
+
+  requestAnimationFrame(update);
+}
+
+update();
+          </script>
+          </body>
+      </html>
